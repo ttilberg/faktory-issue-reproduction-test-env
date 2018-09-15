@@ -1,0 +1,37 @@
+version: '3'
+services:
+  server:
+    image: contribsys/faktory:0.9.0-beta1
+    ports:
+      - 7419:7419
+      - 7420:7420
+    environment:
+      - FAKTORY_PASSWORD=password
+    command: /faktory -b 0.0.0.0:7419 -w 0.0.0.0:7420 -e production
+
+  nodeworker1:
+    build: node
+    depends_on: [server]
+    environment:
+      - FAKTORY_QUEUE=one
+      - FAKTORY_URL=tcp://:password@server:7419
+
+  nodeworker2:
+    build: node
+    depends_on: [server]
+    environment:
+      - FAKTORY_QUEUE=one
+      - FAKTORY_URL=tcp://:password@server:7419    
+
+  nodeworker3:
+    build: node
+    depends_on: [server]
+    environment:
+      - FAKTORY_QUEUE=two
+      - FAKTORY_URL=tcp://:password@server:7419    
+
+  rubyworker1:
+    build: ruby
+    depends_on: [server]
+    environment:
+      - FAKTORY_URL=tcp://:password@server:7419
